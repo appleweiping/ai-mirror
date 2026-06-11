@@ -4,57 +4,84 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1" />
   <title>AI Mirror — 免费多模型 AI</title>
-  <meta name="description" content="Free multi-model AI chat: ChatGPT, Gemini, Claude, DeepSeek, Qwen, GLM, Kimi, MiniMax, Doubao, ERNIE. One place, brand-matched UI, deployed on Vercel." />
-  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' rx='22' fill='%2310a37f'/><text x='50' y='68' font-size='58' text-anchor='middle' fill='white' font-family='sans-serif' font-weight='bold'>✦</text></svg>" />
+  <meta name="description" content="Free multi-model AI chat mirror: ChatGPT, Gemini, Claude, DeepSeek, Qwen, GLM, Kimi, MiniMax, Doubao, ERNIE, Hugging Face. BYOK, Vercel edge, multilingual." />
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' rx='22' fill='%2310a37f'/><text x='50' y='62' font-size='34' text-anchor='middle' fill='white' font-family='sans-serif' font-weight='bold'>AI</text></svg>" />
   <link rel="stylesheet" href="styles.css" />
   <link rel="stylesheet" href="themes.css" />
+  <script type="importmap">
+    { "imports": { "three": "https://cdn.jsdelivr.net/npm/three@0.182.0/build/three.module.js" } }
+  </script>
 </head>
 <body>
-  <header>
-    <div class="brand">
-      <div class="glyph" id="brandGlyph">✦</div>
-      <div>
+  <header class="topbar">
+    <div class="brand" aria-label="AI Mirror">
+      <div class="glyph" id="brandGlyph">AI</div>
+      <div class="brand-copy">
         <div id="brandName">AI Mirror</div>
         <div class="sub" id="tagline">免费多模型 AI 镜像</div>
       </div>
     </div>
     <div class="spacer"></div>
-    <select class="ctrl" id="langSel" aria-label="language"></select>
-    <button class="ctrl" id="modeBtn" aria-label="toggle dark mode">🌙</button>
+    <select class="ctrl language" id="langSel" aria-label="language"></select>
+    <button class="ctrl icon" id="modeBtn" aria-label="toggle dark mode">☾</button>
     <button class="ctrl" id="settingsBtn">⚙ <span id="settingsLabel">设置</span></button>
-    <button class="ctrl" id="clearBtn" title="clear">🗑</button>
+    <button class="ctrl icon" id="clearBtn" title="clear" aria-label="clear">⌫</button>
   </header>
 
-  <nav class="models" id="modelPills"></nav>
+  <nav class="models" id="modelPills" aria-label="model providers"></nav>
 
-  <main id="main">
-    <div class="thread" id="thread">
-      <div class="welcome" id="welcome">
-        <div class="hero" id="welcomeHero">✦</div>
-        <h1 id="welcomeTitle">选个模型，开始聊天</h1>
-        <p id="welcomeBody"></p>
+  <div class="notice-bar" id="noticeBar" hidden>
+    <span id="noticeText"></span>
+    <button class="notice-dismiss" id="noticeDismiss" type="button" aria-label="dismiss">×</button>
+  </div>
+
+  <section class="provider-panel" aria-label="selected provider">
+    <div class="provider-card">
+      <div class="provider-mark" id="selectedProviderGlyph">AI</div>
+      <div class="provider-copy">
+        <div class="provider-title-row">
+          <h2 id="selectedProviderLabel">ChatGPT</h2>
+          <span class="status-badge" id="providerStatus">Ready</span>
+        </div>
+        <p id="selectedProviderSub"></p>
+        <p class="provider-help" id="providerHelp"></p>
+      </div>
+      <div class="provider-controls">
+        <label for="modelSel" id="modelLabel">模型</label>
+        <select id="modelSel"></select>
+      </div>
+      <div class="provider-actions">
+        <button class="btn ghost compact" id="providerAction" type="button">设置</button>
+        <button class="btn ghost compact" id="newChatBtn" type="button">新对话</button>
       </div>
     </div>
+  </section>
+
+  <main id="main">
+    <div class="thread" id="thread"></div>
   </main>
 
   <footer>
     <div class="composer">
       <textarea id="input" rows="1" placeholder=""></textarea>
-      <button class="send" id="sendBtn" disabled>↑</button>
+      <button class="send" id="sendBtn" disabled title="send">↑</button>
     </div>
     <div class="foot-note" id="footNote"></div>
   </footer>
 
-  <!-- settings modal -->
-  <div class="overlay" id="overlay">
-    <div class="modal">
+  <div class="toast" id="toast" role="status" aria-live="polite"></div>
+
+  <div class="overlay" id="overlay" aria-hidden="true">
+    <div class="modal" role="dialog" aria-modal="true" aria-labelledby="mTitle">
+      <button class="modal-close" id="mClose" type="button">×</button>
       <h2 id="mTitle">设置</h2>
       <p class="desc" id="mDesc"></p>
       <div id="keyFields"></div>
       <p class="note-warn" id="mWarn"></p>
+      <button class="btn danger" id="mClearAll" type="button"></button>
       <div class="modal-actions">
-        <button class="btn ghost" id="mCancel">取消</button>
-        <button class="btn primary" id="mSave">保存</button>
+        <button class="btn ghost" id="mCancel" type="button">取消</button>
+        <button class="btn primary" id="mSave" type="button">保存</button>
       </div>
     </div>
   </div>

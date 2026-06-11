@@ -69,7 +69,7 @@ async function streamOpenAI(auth, model, messages, temperature) {
   });
 
   if (!upstream.ok || !upstream.body) {
-    const detail = await safeText(upstream);
+    const detail = redact(await safeText(upstream), auth.key);
     return json({ error: "upstream error", status: upstream.status, detail }, upstream.status || 502);
   }
 
@@ -112,7 +112,7 @@ async function streamAnthropic(auth, model, messages, temperature) {
   });
 
   if (!upstream.ok || !upstream.body) {
-    const detail = await safeText(upstream);
+    const detail = redact(await safeText(upstream), auth.key);
     return json({ error: "upstream error", status: upstream.status, detail }, upstream.status || 502);
   }
 
@@ -172,6 +172,11 @@ function sseResponse(stream) {
 
 async function safeText(r) {
   try { return (await r.text()).slice(0, 500); } catch { return ""; }
+}
+
+function redact(text, secret) {
+  if (!secret) return text;
+  return String(text).split(secret).join("[redacted]");
 }
 
 function json(obj, status = 200) {
