@@ -46,7 +46,15 @@ users just paste their own keys in Settings.
 | `MINIMAX_API_KEY` | MiniMax | paid |
 | `ARK_API_KEY` | Doubao | uses Volcano Ark endpoint IDs |
 | `QIANFAN_API_KEY` | ERNIE | `ernie-speed` free |
+| `HF_TOKEN` | Hugging Face | routes OpenAI-compatible chat through `router.huggingface.co` |
 | `RELAY_BASE_URL` + `RELAY_API_KEY` | any relay-capable | one OpenAI-compatible endpoint that fronts many models |
+
+Optional compatible base URL overrides:
+
+| Variable | Applies to | Notes |
+|----------|------------|-------|
+| `OPENAI_BASE_URL` | ChatGPT provider operator key | Useful for an OpenAI-compatible gateway used with `OPENAI_API_KEY` |
+| `HF_BASE_URL` | Hugging Face provider operator token | Defaults to `https://router.huggingface.co/v1` |
 
 ### About the relay
 
@@ -73,3 +81,11 @@ with your URL can spend them.** For a public site:
 - `GET /api/models` → JSON catalog with `serverReady` flags.
 - Pick a free-tier model (or one you set a key for), send a message → tokens stream in.
 - If a model says "no key", open Settings and paste a key — it should work immediately.
+
+## Local verification
+
+Run `npm run dev`, not a plain static file server. The Vercel CLI local server is
+required because the frontend depends on `/api/models` and `/api/chat`.
+
+`npm run dev:static` is useful only for visual preview; the UI will intentionally
+show a static-preview warning and block sends.

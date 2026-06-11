@@ -1,10 +1,12 @@
 <div align="center">
 
+![AI Mirror banner](public/assets/ai-mirror-banner.png)
+
 # ✦ AI Mirror
 
 **人人可用的免费多模型 AI 聊天 —— 国内用户也能直接用。**
 
-ChatGPT · Gemini · Claude · DeepSeek · 通义千问 · 智谱GLM · Kimi · MiniMax · 豆包 · 文心
+ChatGPT · Gemini · Claude · DeepSeek · 通义千问 · 智谱GLM · Kimi · MiniMax · 豆包 · 文心 · Hugging Face
 —— 全部集成在一个网页里，每个模型配它专属的品牌美学。
 
 [English](README.md) · 🌐 **中文** · [日本語](README.ja.md) · [한국어](README.ko.md)
@@ -17,9 +19,9 @@ ChatGPT · Gemini · Claude · DeepSeek · 通义千问 · 智谱GLM · Kimi · 
 
 ## 这是什么
 
-一个干净的网页界面，让任何人都能和 10+ 主流大模型聊天，并随时一键切换。选中某个模型，
+一个干净的网页界面，让任何人都能和 11+ 主流/开源大模型聊天，并随时一键切换。选中某个模型，
 **整个界面会换上该品牌真实的视觉语言** —— OpenAI 的绿、Gemini 的蓝紫极光、Claude 的暖陶土、
-DeepSeek 的深海蓝，等等。
+DeepSeek 的深海蓝、Hugging Face 的开放模型暖黄，等等。
 
 它**完全跑在 Vercel 上**（静态前端 + 边缘函数），**不需要任何额外服务器** —— 这让它成为
 最稳的部署方式，也意味着没有别的东西需要托管或维护。
@@ -40,8 +42,10 @@ AI Mirror 给你三条诚实的路，可按模型混用：
 
 ## 功能
 
-- **10 个模型，一个界面** —— 几乎全部走 OpenAI 兼容协议；Claude 的 `/v1/messages`
+- **11 个服务，一个界面** —— 几乎全部走 OpenAI 兼容协议；Claude 的 `/v1/messages`
   被透明转换，浏览器只需处理一种格式。
+- **模型选择与覆盖** —— 可从模型列表中选择，也可填入豆包、Hugging Face 或中转服务需要的真实模型/端点 ID。
+- **更顺手的聊天体验** —— 快速提示词、停止生成、复制回答、按服务清空会话，并在缺 Key 时明确引导。
 - **品牌专属皮肤** —— 切换模型即切换整套明/暗主题。
 - **逐字流式输出**（SSE）。
 - **自带 Key，隐私安全** —— Key 只存在你浏览器里；代理只用它发起一次上游调用，绝不记录或存储。
@@ -59,15 +63,26 @@ AI Mirror 给你三条诚实的路，可按模型混用：
 
 完成。之后每次 `git push` 自动重新部署。完整指南见 [`docs/DEPLOY.md`](docs/DEPLOY.md)。
 
+## 本地开发
+
+请用 Vercel CLI 本地运行，这样静态页面和 `/api/*` 才会一起工作：
+
+```bash
+npm run dev
+```
+
+访问 `http://localhost:3000`。`npm run dev:static` 只适合视觉预览；因为没有 API，聊天会被禁用。
+
 ## 架构
 
 ```
 public/            静态前端（无框架、无打包）
   index.html       页面骨架
-  app.js           状态、SSE 流式客户端、主题切换
+  app.js           状态、SSE 流式客户端、主题/模型/Key 交互
   styles.css       布局与组件（CSS 变量驱动）
-  themes.css       10 套品牌主题 × 明/暗
+  themes.css       11 套品牌主题 × 明/暗
   i18n.js          中 / 英 / 日 / 韩 文案
+  assets/          生成的 banner 与静态视觉资源
 api/               Vercel 边缘函数
   _providers.js    模型注册表 + 鉴权解析（自带Key→环境变量→中转）
   chat.js          流式代理；OpenAI + Anthropic 协议 → 统一 SSE

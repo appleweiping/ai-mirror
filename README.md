@@ -1,10 +1,12 @@
 <div align="center">
 
+![AI Mirror banner](public/assets/ai-mirror-banner.png)
+
 # ✦ AI Mirror
 
 **Free multi-model AI chat for everyone — including users in mainland China.**
 
-ChatGPT · Gemini · Claude · DeepSeek · Qwen · GLM · Kimi · MiniMax · Doubao · ERNIE
+ChatGPT · Gemini · Claude · DeepSeek · Qwen · GLM · Kimi · MiniMax · Doubao · ERNIE · Hugging Face
 — all in one web app, each with its own brand-matched aesthetic.
 
 🌐 **English** · [中文](README.zh.md) · [日本語](README.ja.md) · [한국어](README.ko.md)
@@ -17,10 +19,10 @@ ChatGPT · Gemini · Claude · DeepSeek · Qwen · GLM · Kimi · MiniMax · Dou
 
 ## What it is
 
-A single, clean web UI that lets anyone chat with 10+ frontier models and switch
+A single, clean web UI that lets anyone chat with 11+ frontier/open models and switch
 between them instantly. Pick a model and **the entire interface restyles** to that
 brand's real visual language — OpenAI green, Gemini's blue→purple aurora, Claude's
-warm clay, DeepSeek deep-blue, and so on.
+warm clay, DeepSeek deep-blue, Hugging Face amber, and so on.
 
 It runs **entirely on Vercel** (static frontend + edge functions). **No separate
 server is required** — which makes it the most reliable possible deploy and means
@@ -43,8 +45,12 @@ violate provider ToS and is unstable — use at your own risk.
 
 ## Features
 
-- **10 providers, 1 UI** — OpenAI-compatible protocol for nearly all; Claude's
+- **11 providers, 1 UI** — OpenAI-compatible protocol for nearly all; Claude's
   `/v1/messages` is translated transparently so the browser speaks one format.
+- **Model picker + override** — choose from each provider's model list or enter
+  a custom model/endpoint ID for Doubao, relays, and Hugging Face routes.
+- **Better chat ergonomics** — quick prompts, stop generation, copy answers,
+  clear per-provider conversations, and clear "needs key" guidance.
 - **Per-brand theming** — switching a model flips a full light/dark theme.
 - **Token-by-token streaming** via Server-Sent Events.
 - **BYOK, private** — keys live in your browser only; the proxy uses them for one
@@ -65,15 +71,28 @@ violate provider ToS and is unstable — use at your own risk.
 That's it. Every `git push` re-deploys automatically. Full guide:
 [`docs/DEPLOY.md`](docs/DEPLOY.md).
 
+## Local development
+
+Use Vercel CLI locally so `/api/models` and `/api/chat` run next to the static UI:
+
+```bash
+npm run dev
+```
+
+The app opens at `http://localhost:3000`. `npm run dev:static` is only a static
+preview; chat and provider availability will be disabled because `/api/*` is not
+running.
+
 ## Architecture
 
 ```
 public/            static frontend (no framework, no build)
   index.html       shell
-  app.js           state, streaming SSE client, theme switching
+  app.js           state, streaming SSE client, theme/model/key UX
   styles.css       layout + components (CSS-variable driven)
-  themes.css       10 brand themes × light/dark
+  themes.css       11 brand themes × light/dark
   i18n.js          zh / en / ja / ko strings
+  assets/          generated banner and static visual assets
 api/               Vercel edge functions
   _providers.js    provider registry + auth resolution (BYOK→env→relay)
   chat.js          streaming proxy; OpenAI + Anthropic protocols → unified SSE
@@ -99,4 +118,3 @@ or relay is configured, "Free" if it has an official free tier, else "Bring key"
 ## License
 
 MIT — see [LICENSE](LICENSE).
-

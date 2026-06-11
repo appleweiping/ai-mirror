@@ -14,6 +14,7 @@ export const PROVIDERS = {
     protocol: "openai",
     baseUrl: "https://api.openai.com/v1",
     envKey: "OPENAI_API_KEY",
+    envBaseUrl: "OPENAI_BASE_URL",
     relayCapable: true,
     models: ["gpt-4o", "gpt-4o-mini", "o4-mini"],
   },
@@ -94,6 +95,16 @@ export const PROVIDERS = {
     freeTier: true, // ernie-speed / ernie-lite are free
     models: ["ernie-4.0-turbo-8k", "ernie-speed-128k", "ernie-lite-8k"],
   },
+  huggingface: {
+    label: "Hugging Face",
+    protocol: "openai",
+    baseUrl: "https://router.huggingface.co/v1",
+    envKey: "HF_TOKEN",
+    envBaseUrl: "HF_BASE_URL",
+    relayCapable: false,
+    // Hugging Face Inference Providers expose an OpenAI-compatible chat API.
+    models: ["openai/gpt-oss-120b:fastest", "openai/gpt-oss-20b:fastest", "deepseek-ai/DeepSeek-R1:fastest"],
+  },
 };
 
 // Resolve which key + base URL + protocol to use for a request.
@@ -109,7 +120,10 @@ export function resolveAuth(providerId, byokKey, env) {
   // 2) operator's official key from env
   const envVal = env[p.envKey];
   if (envVal && envVal.trim()) {
-    return { key: envVal.trim(), baseUrl: p.baseUrl, protocol: p.protocol, source: "operator" };
+    const baseUrl = p.envBaseUrl && env[p.envBaseUrl]?.trim()
+      ? env[p.envBaseUrl].trim().replace(/\/$/, "")
+      : p.baseUrl;
+    return { key: envVal.trim(), baseUrl, protocol: p.protocol, source: "operator" };
   }
   // 3) optional relay (OpenAI-compatible) for providers that allow it
   if (p.relayCapable && env.RELAY_BASE_URL && env.RELAY_API_KEY) {

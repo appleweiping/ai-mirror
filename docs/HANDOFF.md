@@ -9,13 +9,18 @@ before changing anything.
 Vercel** (deployment is a GitHub-integration click in the Vercel dashboard — see
 [`DEPLOY.md`](DEPLOY.md) Option A; the owner does this, no token was shared).
 
-- ✅ 10-provider registry + auth resolution — **14/14 unit assertions pass**
+- ✅ 11-provider registry + auth resolution — includes Hugging Face and base URL overrides for compatible gateways.
   (BYOK → operator env → relay precedence, protocol selection, slash trimming,
   relay-capability gating, `serverUsable`).
 - ✅ Streaming proxy: OpenAI-compatible path + Anthropic→OpenAI translation,
   both re-emitted as a unified `data: {"delta": "..."}` SSE stream.
-- ✅ Frontend: model pills, per-brand theming (10 brands × light/dark), SSE
-  client, BYOK settings modal, per-model local history, 4 languages.
+- ✅ Frontend: model pills, model selector/override, per-brand theming, SSE
+  client with stop generation, BYOK settings modal, quick prompts, copy action,
+  per-model local history, 4 languages.
+- ✅ Generated banner asset at `public/assets/ai-mirror-banner.png`, referenced
+  by the app welcome screen and README.
+- ✅ Hugging Face provider added through the OpenAI-compatible Inference
+  Providers router (`HF_TOKEN`, optional `HF_BASE_URL`).
 - ✅ `node build.js` passes; all `.js` pass `node --check`.
 - ⚠️ **Not yet run against live provider APIs** — no keys were available in the
   build environment. The protocol shapes follow each vendor's public docs but
@@ -63,7 +68,8 @@ translates. Adding a new OpenAI-compatible provider = **one entry in
   keys, add a Vercel KV / Upstash counter or the Vercel firewall. (High priority
   if operator keys are used; irrelevant for pure BYOK.)
 - **Model picker uses `models[0]` only.** The registry lists multiple models per
-  provider but the UI always sends the first. Add a model dropdown per provider.
+  provider but the UI always sends the first. Fixed: the UI now has a model
+  dropdown plus custom model/endpoint override.
 - **No markdown rendering** in assistant messages (plain text + basic `pre/code`
   styling exists in CSS but isn't wired to a parser). Adding `marked` +
   sanitization would improve readability.

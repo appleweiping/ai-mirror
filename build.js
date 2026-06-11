@@ -4,8 +4,11 @@
 // api/, so there's nothing to compile. We just sanity-check that the expected
 // assets exist, then exit 0 so Vercel proceeds to publish public/.
 
-const fs = require("fs");
-const path = require("path");
+import fs from "node:fs";
+import path from "node:path";
+import { fileURLToPath } from "node:url";
+
+const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
 const required = [
   "public/index.html",
@@ -13,6 +16,8 @@ const required = [
   "public/styles.css",
   "public/themes.css",
   "public/i18n.js",
+  "public/scene3d.js",
+  "public/assets/ai-mirror-banner.png",
   "api/chat.js",
   "api/models.js",
   "api/_providers.js",

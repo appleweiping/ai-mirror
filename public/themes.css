@@ -118,6 +118,18 @@
   --fg-soft: #8c92b0; --border: #232843; --user-bubble: #1a1f3a;
 }
 
+/* ===================== Hugging Face — amber/open model community, warm but crisp ===================== */
+[data-theme="huggingface"] {
+  --accent: #ffb000; --accent-fg: #111318;
+  --brand-gradient: linear-gradient(135deg, #ffcf4a, #ff9f1c 55%, #f97316);
+  --user-bubble: #fff6db; --pill-color: #ffb000;
+  --bg-soft: #fffaf0; --border: #f0e2c2;
+}
+[data-theme="huggingface"][data-mode="dark"] {
+  --bg: #17130b; --bg-soft: #221b10; --bg-elev: #221b10; --fg: #f5efe1;
+  --fg-soft: #b9a98b; --border: #3a2c16; --user-bubble: #2d2414;
+}
+
 /* dark-mode default fallback (no theme) */
 [data-mode="dark"] {
   --bg: #1a1a1a; --bg-soft: #242424; --bg-elev: #242424; --fg: #ececec;

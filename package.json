@@ -2,10 +2,13 @@
   "name": "ai-mirror",
   "version": "1.0.0",
   "private": true,
-  "description": "Free multi-model AI chat mirror (ChatGPT / Gemini / Claude / DeepSeek / Qwen / GLM / Kimi / MiniMax / Doubao / ERNIE) for users in China. Pure Vercel edge — no server. BYOK + free tiers + optional relay.",
+  "type": "module",
+  "description": "Free multi-model AI chat mirror (ChatGPT / Gemini / Claude / DeepSeek / Qwen / GLM / Kimi / MiniMax / Doubao / ERNIE / Hugging Face) for users in China. Pure Vercel edge — no server. BYOK + free tiers + optional relay.",
   "license": "MIT",
   "scripts": {
-    "dev": "npx serve public",
-    "build": "node build.js"
+    "dev": "npx --yes vercel dev --listen 3000",
+    "dev:static": "npx --yes serve public",
+    "build": "node build.js",
+    "check": "node build.js && node --check public/app.js && node --check public/i18n.js && node --check public/scene3d.js && node --check api/chat.js && node --check api/models.js && node --check api/_providers.js"
   }
 }
