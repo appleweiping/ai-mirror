@@ -1,0 +1,17 @@
+# deps
+node_modules/
+
+# vercel
+.vercel/
+.env
+.env.*
+!.env.example
+
+# os / editor
+.DS_Store
+Thumbs.db
+*.log
+
+# secrets — never commit keys
+secrets.json
+*.key

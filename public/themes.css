@@ -1,0 +1,125 @@
+/* ai-mirror — per-brand aesthetics.
+   Each [data-theme] block recolors the whole UI to match that provider's real
+   brand language: palette, accent, gradient, bubble tint. Switching a model
+   pill flips data-theme on <html> and the app reskins with a smooth transition.
+   Each theme ships a light + dark variant ([data-mode="dark"]). */
+
+/* ===================== ChatGPT — OpenAI green/teal, clean & minimal ===================== */
+[data-theme="openai"] {
+  --accent: #10a37f; --accent-fg: #fff;
+  --brand-gradient: linear-gradient(135deg, #10a37f, #0e8c6d);
+  --user-bubble: #f0f7f4; --pill-color: #10a37f;
+}
+[data-theme="openai"][data-mode="dark"] {
+  --bg: #212121; --bg-soft: #2a2a2a; --bg-elev: #2a2a2a; --fg: #ececec;
+  --fg-soft: #a0a0a0; --border: #3a3a3a; --user-bubble: #2f2f2f;
+}
+
+/* ===================== Gemini — Google blue→purple aurora, soft & airy ===================== */
+[data-theme="gemini"] {
+  --accent: #1a73e8; --accent-fg: #fff;
+  --brand-gradient: linear-gradient(120deg, #4285f4, #9b72cb 50%, #d96570);
+  --user-bubble: #eef3fd; --pill-color: #4285f4;
+  --bg-soft: #f8faff; --radius: 18px;
+}
+[data-theme="gemini"][data-mode="dark"] {
+  --bg: #131314; --bg-soft: #1e1f20; --bg-elev: #1e1f20; --fg: #e3e3e3;
+  --fg-soft: #9aa0a6; --border: #2d2e30; --user-bubble: #1e2a3a;
+}
+
+/* ===================== Claude — Anthropic warm clay / terracotta, paper feel ===================== */
+[data-theme="claude"] {
+  --accent: #d97757; --accent-fg: #fff;
+  --brand-gradient: linear-gradient(135deg, #d97757, #c2410c);
+  --user-bubble: #f7f1ea; --pill-color: #d97757;
+  --bg: #faf9f5; --bg-soft: #f2efe6; --bg-elev: #ffffff; --border: #e8e2d6;
+  --font: "Times New Roman", Georgia, "Songti SC", serif;
+}
+[data-theme="claude"] header, [data-theme="claude"] .composer textarea { font-family: -apple-system, "PingFang SC", sans-serif; }
+[data-theme="claude"][data-mode="dark"] {
+  --bg: #262624; --bg-soft: #30302e; --bg-elev: #30302e; --fg: #f0eee6;
+  --fg-soft: #a8a299; --border: #3d3c39; --user-bubble: #383632;
+}
+
+/* ===================== DeepSeek — deep ocean blue, technical & precise ===================== */
+[data-theme="deepseek"] {
+  --accent: #4d6bfe; --accent-fg: #fff;
+  --brand-gradient: linear-gradient(135deg, #4d6bfe, #2845d6);
+  --user-bubble: #eef1ff; --pill-color: #4d6bfe;
+}
+[data-theme="deepseek"][data-mode="dark"] {
+  --bg: #0f1117; --bg-soft: #181b24; --bg-elev: #181b24; --fg: #e6e8ee;
+  --fg-soft: #8b90a0; --border: #262a36; --user-bubble: #1a2238;
+}
+
+/* ===================== Qwen — Alibaba/Tongyi violet-indigo, futuristic ===================== */
+[data-theme="qwen"] {
+  --accent: #615ced; --accent-fg: #fff;
+  --brand-gradient: linear-gradient(135deg, #7b61ff, #615ced 60%, #4f46e5);
+  --user-bubble: #f0eefe; --pill-color: #615ced;
+}
+[data-theme="qwen"][data-mode="dark"] {
+  --bg: #14121f; --bg-soft: #1d1a2e; --bg-elev: #1d1a2e; --fg: #e8e6f2;
+  --fg-soft: #9890b0; --border: #2a2640; --user-bubble: #221d3a;
+}
+
+/* ===================== GLM (Zhipu) — emerald/jade green, scholarly ===================== */
+[data-theme="glm"] {
+  --accent: #1f9c6b; --accent-fg: #fff;
+  --brand-gradient: linear-gradient(135deg, #2bbd84, #1f9c6b);
+  --user-bubble: #ebf7f1; --pill-color: #1f9c6b;
+}
+[data-theme="glm"][data-mode="dark"] {
+  --bg: #0d1714; --bg-soft: #15211c; --bg-elev: #15211c; --fg: #e4f0ea;
+  --fg-soft: #88a89a; --border: #213029; --user-bubble: #18271f;
+}
+
+/* ===================== Kimi (Moonshot) — midnight purple + moon glow ===================== */
+[data-theme="kimi"] {
+  --accent: #6b4eff; --accent-fg: #fff;
+  --brand-gradient: linear-gradient(135deg, #8b5cf6, #6b4eff 60%, #4338ca);
+  --user-bubble: #f1edff; --pill-color: #6b4eff;
+}
+[data-theme="kimi"][data-mode="dark"] {
+  --bg: #0e0c1a; --bg-soft: #171327; --bg-elev: #171327; --fg: #e9e6f5;
+  --fg-soft: #948cb5; --border: #241f3d; --user-bubble: #1d1733;
+}
+
+/* ===================== MiniMax — vivid coral-red, energetic ===================== */
+[data-theme="minimax"] {
+  --accent: #f23c5d; --accent-fg: #fff;
+  --brand-gradient: linear-gradient(135deg, #ff5b78, #f23c5d 60%, #d61f47);
+  --user-bubble: #fdeef1; --pill-color: #f23c5d;
+}
+[data-theme="minimax"][data-mode="dark"] {
+  --bg: #18100f; --bg-soft: #241716; --bg-elev: #241716; --fg: #f2e6e6;
+  --fg-soft: #b08f8f; --border: #361f1f; --user-bubble: #2e1a1c;
+}
+
+/* ===================== Doubao (ByteDance) — sky cyan-blue, playful ===================== */
+[data-theme="doubao"] {
+  --accent: #0a84ff; --accent-fg: #fff;
+  --brand-gradient: linear-gradient(135deg, #3aa0ff, #0a84ff 60%, #0066cc);
+  --user-bubble: #e9f4ff; --pill-color: #0a84ff; --radius: 18px;
+}
+[data-theme="doubao"][data-mode="dark"] {
+  --bg: #0c1420; --bg-soft: #131e2e; --bg-elev: #131e2e; --fg: #e4edf7;
+  --fg-soft: #88a0bb; --border: #1f2d40; --user-bubble: #15233a;
+}
+
+/* ===================== ERNIE (Baidu) — Baidu blue + warm accent, classic ===================== */
+[data-theme="ernie"] {
+  --accent: #2932e1; --accent-fg: #fff;
+  --brand-gradient: linear-gradient(135deg, #4e5bff, #2932e1);
+  --user-bubble: #ecedfd; --pill-color: #2932e1;
+}
+[data-theme="ernie"][data-mode="dark"] {
+  --bg: #0d0f1c; --bg-soft: #161a2e; --bg-elev: #161a2e; --fg: #e6e8f2;
+  --fg-soft: #8c92b0; --border: #232843; --user-bubble: #1a1f3a;
+}
+
+/* dark-mode default fallback (no theme) */
+[data-mode="dark"] {
+  --bg: #1a1a1a; --bg-soft: #242424; --bg-elev: #242424; --fg: #ececec;
+  --fg-soft: #9a9a9a; --border: #333; --user-bubble: #2a2a2a;
+}
