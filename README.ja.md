@@ -1,6 +1,6 @@
 <div align="center">
 
-![AI Mirror banner](public/assets/ai-mirror-banner.gif)
+![AI Mirror banner](public/assets/ai-mirror-banner.png)
 
 # ✦ AI Mirror
 
