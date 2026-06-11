@@ -15,3 +15,5 @@ Thumbs.db
 # secrets — never commit keys
 secrets.json
 *.key
+
+.vercel
