@@ -1,120 +1,61 @@
-<div align="center">
+# AI Mirror
 
-![AI Mirror banner](public/assets/ai-mirror-banner.png)
+Send one prompt to two or three LLMs side by side and compare their answers, latency, token counts and estimated cost.
 
-# ✦ AI Mirror
+![Running one prompt on three models at once](docs/demo.gif)
 
-**Free multi-model AI chat for everyone — including users in mainland China.**
+*The GIF was recorded locally with `MOCK_UPSTREAM=1`, so the replies, timings and token counts in it are canned by [`scripts/mock-upstream.mjs`](scripts/mock-upstream.mjs) and say nothing about the real models. With real keys the columns show real answers.*
 
-ChatGPT · Gemini · Claude · DeepSeek · Qwen · GLM · Kimi · MiniMax · Doubao · ERNIE · Hugging Face
-— all in one web app, each with its own brand-matched aesthetic.
+**Live:** https://ai-mirror-dusky.vercel.app (bring your own API keys)
 
-🌐 **English** · [中文](README.zh.md) · [日本語](README.ja.md) · [한국어](README.ko.md)
+## Why I built it
 
-[![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new/clone?repository-url=https://github.com/appleweiping/ai-mirror)
+When I pick a model for a project I want to see the same prompt answered by a cheap model and a stronger one, and know what each answer cost and how long it took. Provider playgrounds only show their own models, and switching tabs makes it hard to compare. This page puts the answers next to each other with the numbers underneath.
 
-</div>
+An earlier version of this repo was a chat app that restyled itself to look like each vendor's product and was pitched as "free AI for users in mainland China" with relay suggestions. I dropped all of that: copying other companies' branding is not mine to do, and the "free" pitch was misleading, since every provider here needs a key and someone pays for every call.
 
----
+## What it does
 
-## What it is
+- Pick two or three columns, each with a provider and model. Providers: OpenAI, Anthropic, Google Gemini, DeepSeek, Mistral and OpenRouter (one OpenRouter key reaches Qwen, GLM, Kimi, gpt-oss and many others). The model field is free text, so any model id the provider accepts works.
+- Write a prompt (and optionally a system prompt, temperature and max output tokens) and press **Run on all columns** or Ctrl+Enter. All columns stream at the same time.
+- Under each column: time to first token, total time, input and output tokens, output speed, and an estimated cost from a small [price table](public/js/prices.js) with the date it was checked. Token counts come from the provider when it reports them; otherwise they are estimated from text length and marked with "~".
+- Streamed reasoning, when a provider sends it, is kept in a collapsed "Reasoning" box.
+- **Download as Markdown** saves the prompt, a stats table and every answer.
 
-A single, clean web UI that lets anyone chat with 11+ frontier/open models and switch
-between them instantly. Pick a model and **the entire interface restyles** to that
-brand's real visual language — OpenAI green, Gemini's blue→purple aurora, Claude's
-warm clay, DeepSeek deep-blue, Hugging Face amber, and so on.
+## Run it locally
 
-It runs **entirely on Vercel** (static frontend + edge functions). **No separate
-server is required** — which makes it the most reliable possible deploy and means
-nothing else needs to be hosted or maintained.
-
-## How "free" works (read this)
-
-There is no truly free *ChatGPT API* — OpenAI removed its free tier and every call
-costs money. So AI Mirror gives you three honest paths, mixable per provider:
-
-| Path | What it means | Cost |
-|------|---------------|------|
-| **BYOK** (default) | Users paste their own API key in Settings. Stored only in their browser's localStorage, never uploaded to us, forwarded directly to the provider. | Free to host; user pays provider |
-| **Free tiers** | Gemini, Qwen, GLM (`glm-4-flash`), and ERNIE (`ernie-speed`) have genuine official free tiers — flagged 🆓 in the UI. | Actually free |
-| **Operator keys / relay** | You set provider keys (or one OpenAI-compatible relay URL) in Vercel env vars; those models then work for visitors with no key needed. | You pay, or relay does |
-
-**Gemini is the closest to a real free ChatGPT-style experience**, because Google
-still offers a free tier. The relay path can approximate "free ChatGPT" but may
-violate provider ToS and is unstable — use at your own risk.
-
-## Features
-
-- **11 providers, 1 UI** — OpenAI-compatible protocol for nearly all; Claude's
-  `/v1/messages` is translated transparently so the browser speaks one format.
-- **Model picker + override** — choose from each provider's model list or enter
-  a custom model/endpoint ID for Doubao, relays, and Hugging Face routes.
-- **Better chat ergonomics** — quick prompts, stop generation, copy answers,
-  clear per-provider conversations, and clear "needs key" guidance.
-- **Per-brand theming** — switching a model flips a full light/dark theme.
-- **Token-by-token streaming** via Server-Sent Events.
-- **BYOK, private** — keys live in your browser only; the proxy uses them for one
-  upstream call and never logs or stores them.
-- **4 languages** — 中文 / English / 日本語 / 한국어, auto-detected, switchable.
-- **Per-model chat history** kept locally.
-
-## Deploy to Vercel (no server needed)
-
-1. **Fork / push this repo to GitHub** (already done at `appleweiping/ai-mirror`).
-2. Go to [vercel.com/new](https://vercel.com/new), **Import** the repo. Vercel
-   auto-detects `vercel.json`; no settings to change. Click **Deploy**.
-3. *(Optional)* In **Project → Settings → Environment Variables**, add any keys
-   from [`.env.example`](.env.example) to make those models work without users
-   bringing their own. All are optional — with none set, the app runs in pure
-   BYOK mode and still works.
-
-That's it. Every `git push` re-deploys automatically. Full guide:
-[`docs/DEPLOY.md`](docs/DEPLOY.md).
-
-## Local development
-
-Use Vercel CLI locally so `/api/models` and `/api/chat` run next to the static UI:
+Node 20 or newer, no dependencies to install.
 
 ```bash
-npm run dev
+git clone https://github.com/appleweiping/ai-mirror.git
+cd ai-mirror
+npm run dev      # http://localhost:3000
+npm test
 ```
 
-The app opens at `http://localhost:3000`. `npm run dev:static` is only a static
-preview; chat and provider availability will be disabled because `/api/*` is not
-running.
+Without keys, `MOCK_UPSTREAM=1 npm run dev` (PowerShell: `$env:MOCK_UPSTREAM=1; npm run dev`) answers every request with canned text so you can click through the page; type anything as the key.
 
-## Architecture
+To deploy your own copy, import the repo on Vercel. No build step or environment variables are needed.
 
-```
-public/            static frontend (no framework, no build)
-  index.html       shell
-  app.js           state, streaming SSE client, theme/model/key UX
-  styles.css       layout + components (CSS-variable driven)
-  themes.css       11 brand themes × light/dark
-  i18n.js          zh / en / ja / ko strings
-  assets/          generated banner and static visual assets
-api/               Vercel edge functions
-  _providers.js    provider registry + auth resolution (BYOK→env→relay)
-  chat.js          streaming proxy; OpenAI + Anthropic protocols → unified SSE
-  models.js        catalog + per-provider availability for the UI
-build.js           asset sanity check (static, nothing to compile)
-vercel.json        framework=null, edge runtime
-```
+## Where your prompt and keys go
 
-**Auth resolution** (per request, in `_providers.js`): user's BYOK key →
-operator's env key → optional relay. A provider shows as "Ready" if a server key
-or relay is configured, "Free" if it has an official free tier, else "Bring key".
+- The page sends each column's request, with that provider's key in an `X-User-Key` header, to the site's `/api/chat` edge function. The function forwards it to the provider and streams the answer back. Its code does not log or store prompts or keys; Vercel keeps its normal request logs (path, status, time).
+- Keys stay in the tab's `sessionStorage` unless you tick *Remember keys*, which moves them to `localStorage` in that browser.
+- `/api/chat` only answers pages from its own host (it checks the `Origin` header), so other sites cannot use a deployment as a relay from their visitors' browsers. Server-side keys are ignored unless the operator sets `ALLOW_OPERATOR_KEYS=1`, and then requests are rate-limited per IP. See [`.env.example`](.env.example).
+- Whatever you send is then covered by that provider's own data policy.
 
-## Security notes
+## Reading the numbers
 
-- BYOK keys are stored in `localStorage` and sent only via the `X-User-Key`
-  header to our edge function, which forwards them to the provider over HTTPS and
-  never logs or persists them.
-- The chat endpoint is intentionally open (it's a public proxy). If you set
-  operator keys, **anyone who finds your URL can spend them** — prefer BYOK + free
-  tiers for a public deploy, or add your own rate limiting / auth before exposing
-  operator keys.
+Times are measured in the browser, so they include the round trip through the edge function and your own network. One run is one sample; run a prompt a few times before drawing conclusions about speed. Reasoning models spend hidden output tokens before the first visible token, which shows up as a long "1st token" time and a higher output count than the visible text suggests. Costs use list prices at the standard rate; batch, cached and off-peak pricing are not modelled, and Mistral has no price on file.
+
+## Why not an existing tool?
+
+[OpenRouter's chat room](https://openrouter.ai/chat) and [LMArena](https://lmarena.ai) already let you compare models side by side, and they have far more models. This is a small self-hostable page that uses your own keys directly with each provider, shows latency, token counts and cost next to each answer, and exports the comparison as a file.
+
+## Shared code
+
+The provider adapter (`api/_providers.js`, `api/chat.js`, `api/models.js`), the browser stream client (`public/js/stream-client.js`), the dev server and their tests are shared with my interview practice app [AceCue](https://github.com/appleweiping/acecue). Both repos keep identical copies; `npm run check:shared` compares them with the GitHub copy of the other repo.
 
 ## License
 
-MIT — see [LICENSE](LICENSE).
+MIT, see [LICENSE](LICENSE).
