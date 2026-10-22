@@ -1,92 +1,100 @@
 <!DOCTYPE html>
-<html lang="zh" data-theme="openai" data-mode="light">
+<html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1" />
-  <title>AI Mirror — 免费多模型 AI</title>
-  <meta name="description" content="Free multi-model AI chat mirror: ChatGPT, Gemini, Claude, DeepSeek, Qwen, GLM, Kimi, MiniMax, Doubao, ERNIE, Hugging Face. BYOK, Vercel edge, multilingual." />
-  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' rx='22' fill='%2310a37f'/><text x='50' y='62' font-size='34' text-anchor='middle' fill='white' font-family='sans-serif' font-weight='bold'>AI</text></svg>" />
-  <link rel="stylesheet" href="styles.css" />
-  <link rel="stylesheet" href="themes.css" />
-  <script type="importmap">
-    { "imports": { "three": "https://cdn.jsdelivr.net/npm/three@0.182.0/build/three.module.js" } }
-  </script>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>AI Mirror - compare model answers side by side</title>
+  <meta name="description" content="Send one prompt to two or three language models at once and compare their answers, latency, token counts and estimated cost." />
+  <link rel="icon" href="/assets/favicon.svg" type="image/svg+xml" />
+  <link rel="stylesheet" href="/css/app.css" />
 </head>
 <body>
-  <header class="topbar">
-    <div class="brand" aria-label="AI Mirror">
-      <div class="glyph" id="brandGlyph">AI</div>
-      <div class="brand-copy">
-        <div id="brandName">AI Mirror</div>
-        <div class="sub" id="tagline">免费多模型 AI 镜像</div>
-      </div>
-    </div>
-    <div class="spacer"></div>
-    <select class="ctrl language" id="langSel" aria-label="language"></select>
-    <button class="ctrl icon" id="modeBtn" aria-label="toggle dark mode">☾</button>
-    <button class="ctrl" id="settingsBtn">⚙ <span id="settingsLabel">设置</span></button>
-    <button class="ctrl icon" id="clearBtn" title="clear" aria-label="clear">⌫</button>
+  <header class="top">
+    <a class="brand" href="/">
+      <img src="/assets/favicon.svg" alt="" width="24" height="24" />
+      <span>AI Mirror</span>
+    </a>
+    <span class="tagline">one prompt, several models, side by side</span>
+    <span class="grow"></span>
+    <a class="toplink" href="https://github.com/appleweiping/ai-mirror">Source on GitHub</a>
   </header>
 
-  <nav class="models" id="modelPills" aria-label="model providers"></nav>
+  <main class="wrap">
+    <section class="panel prompt-panel" aria-label="Prompt">
+      <label class="field" for="prompt">Prompt</label>
+      <textarea id="prompt" rows="3" placeholder="Ask something. Ctrl+Enter sends it to every column."></textarea>
 
-  <div class="notice-bar" id="noticeBar" hidden>
-    <span id="noticeText"></span>
-    <button class="notice-dismiss" id="noticeDismiss" type="button" aria-label="dismiss">×</button>
-  </div>
-
-  <section class="provider-panel" aria-label="selected provider">
-    <div class="provider-card">
-      <div class="provider-mark" id="selectedProviderGlyph">AI</div>
-      <div class="provider-copy">
-        <div class="provider-title-row">
-          <h2 id="selectedProviderLabel">ChatGPT</h2>
-          <span class="status-badge" id="providerStatus">Ready</span>
+      <details id="settings-box" class="box">
+        <summary>System prompt and settings</summary>
+        <label class="field" for="system">System prompt <span class="muted">(optional)</span></label>
+        <textarea id="system" rows="2" placeholder="e.g. Answer in at most three sentences."></textarea>
+        <div class="row">
+          <label class="field inline">Temperature
+            <input id="temperature" type="number" min="0" max="2" step="0.1" placeholder="default" />
+          </label>
+          <label class="field inline">Max output tokens
+            <input id="max-tokens" type="number" min="16" max="16384" step="16" value="1024" />
+          </label>
         </div>
-        <p id="selectedProviderSub"></p>
-        <p class="provider-help" id="providerHelp"></p>
-      </div>
-      <div class="provider-controls">
-        <label for="modelSel" id="modelLabel">模型</label>
-        <select id="modelSel"></select>
-      </div>
-      <div class="provider-actions">
-        <button class="btn ghost compact" id="providerAction" type="button">设置</button>
-        <button class="btn ghost compact" id="newChatBtn" type="button">新对话</button>
-      </div>
-    </div>
-  </section>
+        <p class="hint">Reasoning models (GPT-5/6, newer Claude) reject a custom temperature, so the proxy leaves it out for them. Their hidden reasoning also counts as output tokens.</p>
+      </details>
 
-  <main id="main">
-    <div class="thread" id="thread"></div>
+      <details id="keys-box" class="box" open>
+        <summary>API keys</summary>
+        <div id="keys" class="keys"></div>
+        <label class="check"><input type="checkbox" id="remember" /> Remember keys in this browser</label>
+        <p class="hint">A key is only sent when a column uses that provider. One OpenRouter key covers models from many vendors.</p>
+      </details>
+
+      <div class="bar">
+        <button type="button" class="btn primary" id="run">Run on all columns</button>
+        <button type="button" class="btn" id="stop" disabled>Stop</button>
+        <button type="button" class="btn" id="add-col">Add a column</button>
+        <span class="grow"></span>
+        <button type="button" class="btn" id="export" disabled>Download as Markdown</button>
+      </div>
+    </section>
+
+    <section id="columns" class="columns" aria-live="polite"></section>
+
+    <section class="panel prices">
+      <details>
+        <summary>Prices used for the cost estimate <span class="muted" id="price-date"></span></summary>
+        <div id="price-table"></div>
+      </details>
+    </section>
   </main>
 
-  <footer>
-    <div class="composer">
-      <textarea id="input" rows="1" placeholder=""></textarea>
-      <button class="send" id="sendBtn" disabled title="send">↑</button>
-    </div>
-    <div class="foot-note" id="footNote"></div>
+  <footer class="foot">
+    <p><strong>Privacy.</strong> Your prompt and the key for each column go from this page to the site's <code>/api/chat</code> edge function, which forwards them to that provider and streams the answer back. The function's code does not log or store prompts or keys (Vercel keeps its usual request logs: path, status and time). Keys stay in this tab's <code>sessionStorage</code> unless you tick <em>Remember keys</em>, which saves them in this browser's <code>localStorage</code>. What you send is then covered by each provider's own data policy.</p>
+    <p><strong>About the numbers.</strong> Times are measured in your browser, so they include the hop through the edge function. Token counts come from the provider when it reports them; "~" marks an estimate from text length. Costs are list-price estimates, not your bill.</p>
   </footer>
 
-  <div class="toast" id="toast" role="status" aria-live="polite"></div>
-
-  <div class="overlay" id="overlay" aria-hidden="true">
-    <div class="modal" role="dialog" aria-modal="true" aria-labelledby="mTitle">
-      <button class="modal-close" id="mClose" type="button">×</button>
-      <h2 id="mTitle">设置</h2>
-      <p class="desc" id="mDesc"></p>
-      <div id="keyFields"></div>
-      <p class="note-warn" id="mWarn"></p>
-      <button class="btn danger" id="mClearAll" type="button"></button>
-      <div class="modal-actions">
-        <button class="btn ghost" id="mCancel" type="button">取消</button>
-        <button class="btn primary" id="mSave" type="button">保存</button>
+  <template id="col-template">
+    <article class="col panel">
+      <div class="col-head">
+        <select class="provider" aria-label="Provider"></select>
+        <input class="model" aria-label="Model id" autocomplete="off" spellcheck="false" />
+        <button type="button" class="icon remove" title="Remove this column" aria-label="Remove this column">&times;</button>
       </div>
-    </div>
-  </div>
+      <dl class="stats">
+        <div><dt>1st token</dt><dd class="s-ttft">-</dd></div>
+        <div><dt>Total</dt><dd class="s-total">-</dd></div>
+        <div><dt>Tokens in/out</dt><dd class="s-tokens">-</dd></div>
+        <div><dt>Speed</dt><dd class="s-speed">-</dd></div>
+        <div><dt>Cost (est.)</dt><dd class="s-cost">-</dd></div>
+      </dl>
+      <details class="thinking" hidden><summary>Reasoning</summary><pre></pre></details>
+      <div class="output"><p class="placeholder">The answer appears here.</p></div>
+      <div class="col-foot">
+        <span class="status muted"></span>
+        <span class="grow"></span>
+        <button type="button" class="btn small copy" disabled>Copy</button>
+      </div>
+    </article>
+  </template>
 
-  <script src="i18n.js"></script>
-  <script src="app.js"></script>
+  <div class="toast" id="toast" role="status" aria-live="polite"></div>
+  <script type="module" src="/js/main.js"></script>
 </body>
 </html>
